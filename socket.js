@@ -15,12 +15,12 @@ const tcpServer = net.createServer((socket) => {
 
     // Handle incoming messages from TCP clients
     socket.on('data', (data) => {
-        console.log(data);
 
         try {
             // Parse the incoming data (e.g., "client23832:2943.5274,05227.6750,asdasdasd")
             const message = data.toString().trim();
             const [clientId, coordinates] = message.split(":");
+            console.log(coordinates);
 
             if (clientId === 'client23832') {
                 // If the clientId matches, join the corresponding room in Socket.IO
