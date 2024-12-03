@@ -23,11 +23,11 @@ const tcpServer = net.createServer((socket) => {
             console.log(coordinates);
             // Split the data by commas
             const splitData = coordinates.split(',');
-
-            // Check if index 4 exists
+            var integerValue = 0
+                // Check if index 4 exists
             if (splitData[3]) {
                 // Convert the 4th index (0-based index 3) to an integer
-                const integerValue = parseInt(splitData[3], 10);
+                integerValue = parseInt(splitData[3], 10);
 
                 if (!isNaN(integerValue)) {
                     console.log("Integer value:", integerValue);
