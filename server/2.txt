@@ -1,0 +1,63 @@
+worker_processes 1;  # Adjust based on your server's CPU cores
+
+events {
+    worker_connections 1024;  # Maximum number of simultaneous connections per worker process
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    sendfile        on;
+    keepalive_timeout 65;
+
+    # Upstream for port 80
+    upstream websocket_80 {
+        server 127.0.0.1:1884;  # Node.js WebSocket server for port 80
+    }
+
+    # Upstream for port 1883
+    upstream websocket_1883 {
+        server 127.0.0.1:1883;  # Node.js WebSocket server for port 1883
+    }
+
+    # Server block for port 80
+    server {
+        listen 80;  # Listening on port 80
+        server_name 87.248.130.5;  # Your public IP address
+
+        location / {
+            proxy_pass http://websocket_80;  # Forward to websocket_80 upstream
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            proxy_read_timeout 90s;
+            proxy_send_timeout 90s;
+        }
+    }
+
+    # Server block for port 1883
+    server {
+        listen 1883;  # Listening on port 1883
+        server_name 87.248.130.5;  # Your public IP address (or use _ for all)
+
+        location / {
+            proxy_pass http://websocket_1883;  # Forward to websocket_1883 upstream
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            proxy_read_timeout 90s;
+            proxy_send_timeout 90s;
+        }
+    }
+}

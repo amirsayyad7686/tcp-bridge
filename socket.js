@@ -1,0 +1,44 @@
+const net = require('net');
+const ioClient = require('socket.io-client');
+
+// Connect to the existing Socket.IO server
+const socketIoServerUrl = 'http://localhost:5201'; // Update this if your server runs elsewhere
+const io = ioClient(socketIoServerUrl);
+
+// Port for TCP (net) server
+const TCP_PORT = 5202;
+
+// Start the TCP server
+const tcpServer = net.createServer((socket) => {
+    console.log('New TCP client connected');
+
+    // Handle incoming messages from TCP clients
+    socket.on('data', (data) => {
+        console.log('Received from TCP client:', data.toString());
+
+        // Forward the data to the existing Socket.IO server
+        io.emit('message', data.toString()); // Replace 'message' with your custom event name
+    });
+
+    socket.on('error', (err) => {
+        console.error('TCP socket error:', err);
+    });
+
+    socket.on('end', () => {
+        console.log('TCP client disconnected');
+    });
+});
+
+// Start the TCP server
+tcpServer.listen(TCP_PORT, () => {
+    console.log(`TCP server listening on port ${TCP_PORT}`);
+});
+
+// Handle Socket.IO client connection errors
+io.on('connect_error', (err) => {
+    console.error('Error connecting to Socket.IO server:', err);
+});
+
+io.on('connect', () => {
+    console.log('Connected to Socket.IO server at', socketIoServerUrl);
+});
