@@ -12,7 +12,6 @@ const TCP_PORT = 5202;
 const tcpServer = net.createServer((socket) => {
 
     console.log('New TCP client connected');
-    io.join("67437be2b177696c9afb3594");
 
     // Handle incoming messages from TCP clients
     socket.on('data', (data) => {
@@ -28,7 +27,7 @@ const tcpServer = net.createServer((socket) => {
 
                 // Find the socket corresponding to the client (you can store client sockets)
                 // Emit a message to the room or do something else
-                io.join(roomId);
+                io.to(roomId).emit('newData', { clientId, coordinates });
 
 
             } else {
