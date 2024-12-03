@@ -10,16 +10,36 @@ const TCP_PORT = 5202;
 
 // Start the TCP server
 const tcpServer = net.createServer((socket) => {
+
     console.log('New TCP client connected');
-    socket.join("67437be2b177696c9afb3594");
+    io.join("67437be2b177696c9afb3594");
 
     // Handle incoming messages from TCP clients
     socket.on('data', (data) => {
-        console.log('Received from TCP client:', data.toString());
+        try {
+            // Parse the incoming data (e.g., "client23832:2943.5274,05227.6750,asdasdasd")
+            const message = data.toString().trim();
+            const [clientId, coordinates] = message.split(":");
 
-        // Forward the data to the existing Socket.IO server
+            if (clientId === 'client23832') {
+                // If the clientId matches, join the corresponding room in Socket.IO
+                const roomId = '67437be2b177696c9afb3594'; // Room ID associated with this client
+                console.log(`Client joined room: ${roomId}`);
 
-        io.emit('message', data.toString()); // Replace 'message' with your custom event name
+                // Find the socket corresponding to the client (you can store client sockets)
+                // Emit a message to the room or do something else
+                io.join(roomId);
+
+
+            } else {
+                // If the clientId doesn't match, block the IP
+                console.log(`Blocking IP: ${socket.remoteAddress}`);
+                socket.end(); // Close the socket to block the client
+            }
+        } catch (err) {
+            console.error('Error processing data:', err);
+            socket.end(); // Ensure we end the connection on errors
+        }
     });
 
     socket.on('error', (err) => {
