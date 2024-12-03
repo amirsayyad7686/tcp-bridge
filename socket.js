@@ -29,9 +29,14 @@ const tcpServer = net.createServer((socket) => {
 
                 // Find the socket corresponding to the client (you can store client sockets)
                 // Emit a message to the room or do something else
-                io.emit('joinRoom', { userId: roomId });
-
-
+                io.emit('joinRoom', {
+                    userId: roomId,
+                    component_id: '674eb927133796980ce232cb',
+                    component_value: 10,
+                    component_type: 'Sensor',
+                    node_id: 'dac5e546-4ed0-423a-8110-1f7e695680ce',
+                    user_id: '67437be2b177696c9afb3594'
+                });
             } else {
                 // If the clientId doesn't match, block the IP
                 console.log(`Blocking IP: ${socket.remoteAddress}`);
