@@ -11,12 +11,14 @@ const TCP_PORT = 5202;
 // Start the TCP server
 const tcpServer = net.createServer((socket) => {
     console.log('New TCP client connected');
+    socket.join("67437be2b177696c9afb3594");
 
     // Handle incoming messages from TCP clients
     socket.on('data', (data) => {
         console.log('Received from TCP client:', data.toString());
 
         // Forward the data to the existing Socket.IO server
+
         io.emit('message', data.toString()); // Replace 'message' with your custom event name
     });
 

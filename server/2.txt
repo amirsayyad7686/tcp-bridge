@@ -24,7 +24,7 @@ http {
     # Server block for port 80
     server {
         listen 80;  # Listening on port 80
-        server_name 87.248.130.5;  # Your public IP address
+        server_name 65.108.215.114;  # Your public IP address
 
         location / {
             proxy_pass http://websocket_80;  # Forward to websocket_80 upstream
