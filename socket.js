@@ -15,6 +15,8 @@ const tcpServer = net.createServer((socket) => {
 
     // Handle incoming messages from TCP clients
     socket.on('data', (data) => {
+        console.log(data);
+
         try {
             // Parse the incoming data (e.g., "client23832:2943.5274,05227.6750,asdasdasd")
             const message = data.toString().trim();
@@ -27,7 +29,7 @@ const tcpServer = net.createServer((socket) => {
 
                 // Find the socket corresponding to the client (you can store client sockets)
                 // Emit a message to the room or do something else
-                io.to(roomId).emit('joinRoom', { userId: roomId });
+                io.emit('joinRoom', { userId: roomId });
 
 
             } else {
