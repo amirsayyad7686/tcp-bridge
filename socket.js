@@ -21,7 +21,22 @@ const tcpServer = net.createServer((socket) => {
             const message = data.toString().trim();
             const [clientId, coordinates] = message.split(":");
             console.log(coordinates);
+            // Split the data by commas
+            const splitData = coordinates.split(',');
 
+            // Check if index 4 exists
+            if (splitData[3]) {
+                // Convert the 4th index (0-based index 3) to an integer
+                const integerValue = parseInt(splitData[3], 10);
+
+                if (!isNaN(integerValue)) {
+                    console.log("Integer value:", integerValue);
+                } else {
+                    console.error("The value at index 4 is not a valid integer.");
+                }
+            } else {
+                console.error("Index 4 does not exist in the data.");
+            }
             if (clientId === 'client23832') {
                 // If the clientId matches, join the corresponding room in Socket.IO
                 const roomId = '67437be2b177696c9afb3594'; // Room ID associated with this client
@@ -32,7 +47,7 @@ const tcpServer = net.createServer((socket) => {
                 io.emit('message', {
                     userId: roomId,
                     component_id: '674eb927133796980ce232cb',
-                    component_value: 10,
+                    component_value: integerValue,
                     component_type: 'Sensor',
                     node_id: 'dac5e546-4ed0-423a-8110-1f7e695680ce',
                     user_id: '67437be2b177696c9afb3594'
