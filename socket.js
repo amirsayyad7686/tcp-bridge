@@ -29,7 +29,7 @@ const tcpServer = net.createServer((socket) => {
 
                 // Find the socket corresponding to the client (you can store client sockets)
                 // Emit a message to the room or do something else
-                io.emit('joinRoom', {
+                io.emit('message', {
                     userId: roomId,
                     component_id: '674eb927133796980ce232cb',
                     component_value: 10,
