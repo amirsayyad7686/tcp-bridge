@@ -34,8 +34,8 @@ const tcpServer = net.createServer((socket) => {
                 // Check if index 4 exists
 
                 // Convert the 4th index (0-based index 3) to an integer
-                Long = parseFloat(splitData[0].trim());
-                Lat = parseFloat(splitData[1].trim());
+                Long = parseFloat(splitData[0]);
+                Lat = parseFloat(splitData[1]);
                 integerValue1 = parseInt(splitData[2], 10);
                 integerValue2 = parseInt(splitData[3], 10);
                 integerValue3 = parseInt(splitData[4], 10);
