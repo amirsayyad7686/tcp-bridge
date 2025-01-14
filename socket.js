@@ -25,34 +25,40 @@ const tcpServer = net.createServer((socket) => {
                 console.log(coordinates);
                 // Split the data by commas
                 const splitData = coordinates.split(',');
-                var integerValue = 0
-                    // Check if index 4 exists
-                if (splitData[3]) {
-                    // Convert the 4th index (0-based index 3) to an integer
-                    integerValue = parseInt(splitData[3], 10);
+                var integerValue1 = 0
+                var integerValue2 = 0
+                var integerValue3 = 0
+                var Long = 0
+                var Lat = 0
 
-                    if (!isNaN(integerValue)) {
-                        console.log("Integer value:", integerValue);
-                    } else {
-                        console.error("The value at index 4 is not a valid integer.");
-                    }
-                } else {
-                    console.error("Index 4 does not exist in the data.");
-                }
+                // Check if index 4 exists
+
+                // Convert the 4th index (0-based index 3) to an integer
+                Long = parseInt(splitData[0], 10);
+                Lat = parseInt(splitData[1], 10);
+                integerValue1 = parseInt(splitData[2], 10);
+                integerValue2 = parseInt(splitData[3], 10);
+                integerValue3 = parseInt(splitData[4], 10);
+
+                // if (!isNaN(integerValue1)) {
+                //     console.log("Integer value:", integerValue);
+                // } else {
+                //     console.error("The value at index 4 is not a valid integer.");
+                // }
+
                 // If the clientId matches, join the corresponding room in Socket.IO
                 const roomId = '67437be2b177696c9afb3594'; // Room ID associated with this client
                 console.log(`Client joined room: ${roomId}`);
-                socket.join(roomId);
+
                 // Find the socket corresponding to the client (you can store client sockets)
                 // Emit a message to the room or do something else
                 io.emit('message', {
                     userId: roomId,
-                    component_id: '674eb927133796980ce232cb',
-                    component_value: integerValue,
-                    component_type: 'Sensor',
-                    node_id: 'dac5e546-4ed0-423a-8110-1f7e695680ce',
-                    user_id: '67437be2b177696c9afb3594',
-                    value: '1'
+                    Long,
+                    Lat,
+                    integerValue1,
+                    integerValue2,
+                    integerValue3,
                 });
             } else {
                 // If the clientId doesn't match, block the IP
