@@ -51,7 +51,8 @@ const tcpServer = net.createServer((socket) => {
                     component_value: integerValue,
                     component_type: 'Sensor',
                     node_id: 'dac5e546-4ed0-423a-8110-1f7e695680ce',
-                    user_id: '67437be2b177696c9afb3594'
+                    user_id: '67437be2b177696c9afb3594',
+                    value: '1'
                 });
             } else {
                 // If the clientId doesn't match, block the IP
