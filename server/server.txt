@@ -1,0 +1,123 @@
+console.log("Bridge server started");
+
+const WebSocket = require('ws');
+const net = require('net');
+
+// Create WebSocket Server on port 1884
+const wss = new WebSocket.Server({ port: 1884 });
+
+// Create a TCP server on port 1883
+const tcpServer = net.createServer();
+
+// Objects to store WebSocket and TCP clients, keyed by client ID
+const wsClients = {};
+const tcpClients = {};
+
+// Function to parse messages and extract the client ID and data
+function parseMessage(message) {
+    // Ensure the message is a string
+    if (typeof message !== 'string') {
+        message = message.toString();
+    }
+
+    // Split the message to extract clientId and data
+    const [clientId, data] = message.split(':', 2);
+    return { clientId, data };
+}
+
+// Handle new WebSocket connections
+wss.on('connection', (ws) => {
+    console.log('WebSocket client connected on port 1884');
+
+    let wsClientId = null;
+
+    // Handle incoming WebSocket messages
+    ws.on('message', (message) => {
+        console.log('Received from WebSocket client: %s', message);
+
+        // Parse the incoming message
+        const { clientId, data } = parseMessage(message);
+
+        // Store the WebSocket client with its ID
+        if (!wsClientId) {
+            wsClientId = clientId;
+            wsClients[clientId] = ws;
+        }
+
+        // Forward the message to the corresponding TCP client
+        const tcpClient = tcpClients[clientId];
+        if (tcpClient) {
+            tcpClient.write(data);
+            console.log(`Forwarded to TCP client ${clientId} on 1883: ${data}`);
+        }
+    });
+
+    // Handle WebSocket client disconnect
+    ws.on('close', () => {
+        console.log('WebSocket client disconnected from port 1884');
+        if (wsClientId && wsClients[wsClientId]) {
+            delete wsClients[wsClientId];
+        }
+    });
+
+    // Handle WebSocket errors
+    ws.on('error', (err) => {
+        console.error('WebSocket error:', err);
+        if (wsClientId && wsClients[wsClientId]) {
+            delete wsClients[wsClientId];
+        }
+    });
+});
+
+// Handle new TCP connections on port 1883
+tcpServer.on('connection', (tcpSocket) => {
+    console.log('TCP client connected on port 1883');
+
+    let tcpClientId = null;
+
+    // Handle incoming TCP data
+    tcpSocket.on('data', (data) => {
+        const message = data.toString().trim();
+        console.log(`Received from TCP client: ${message}`);
+
+        // Parse the incoming message
+        const { clientId, data: parsedData } = parseMessage(message);
+
+        // Store the TCP client with its ID
+        if (!tcpClientId) {
+            tcpClientId = clientId;
+            tcpClients[clientId] = tcpSocket;
+        }
+
+        // Forward the message to the corresponding WebSocket client
+        const wsClient = wsClients[clientId];
+        if (wsClient) {
+            wsClient.send(parsedData);
+            console.log(`Forwarded to WebSocket client ${clientId} on 1884: ${parsedData}`);
+        }
+    });
+
+    // Handle TCP client disconnect
+    tcpSocket.on('end', () => {
+        console.log('TCP client disconnected from port 1883');
+        if (tcpClientId && tcpClients[tcpClientId]) {
+            delete tcpClients[tcpClientId];
+        }
+    });
+
+    // Handle TCP errors
+    tcpSocket.on('error', (err) => {
+        console.error('TCP socket error:', err);
+        if (tcpClientId && tcpClients[tcpClientId]) {
+            delete tcpClients[tcpClientId];
+        }
+    });
+});
+
+// Define the port for the TCP server
+const TCP_PORT = 1883;
+
+// Start the TCP server
+tcpServer.listen(TCP_PORT, () => {
+    console.log(`TCP server is listening on port ${TCP_PORT}`);
+});

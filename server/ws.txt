@@ -1,0 +1,49 @@
+const WebSocket = require('ws');
+
+// Create a WebSocket server
+const wss = new WebSocket.Server({ port: 1883 });
+
+// Object to store arrays of sockets for each clientId
+const clients = {};
+
+wss.on('connection', (ws) => {
+    let clientId = null;
+
+   ws.on('message', (message) => {
+    // Convert the message to a string if it's a Buffer
+    const messageString = message.toString('utf8');
+
+    // Now you can safely split the string
+    const [receivedClientId, messageContent] = messageString.split(':', 2);
+
+    if (!clientId) {
+        clientId = receivedClientId;
+        if (!clients[clientId]) {
+            clients[clientId] = [];
+        }
+        clients[clientId].push(ws);
+        console.log(`Client connected with ID: ${clientId}`);
+    }
+
+    console.log(`Received from ${clientId}: ${messageContent}`);
+
+    clients[clientId].forEach((clientSocket) => {
+        if (clientSocket !== ws) {
+            clientSocket.send(`From ${clientId}: ${messageContent}`);
+            console.log(`Sent to client ${clientId}: ${messageContent}`);
+        }
+    });
+});
+
+    ws.on('close', () => {
+        if (clientId) {
+            console.log(`Client disconnected: ${clientId}`);
+            clients[clientId] = clients[clientId].filter(clientSocket => clientSocket !== ws);
+            if (clients[clientId].length === 0) {
+                delete clients[clientId];
+            }
+        }
+    });
+});
+
+console.log('WebSocket server is listening on port 1883');
